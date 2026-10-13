@@ -34,12 +34,12 @@
                 <select name="divisi_id" x-model="divisi" class="field"><option value="">— Tanpa divisi —</option>@foreach ($divisis as $d)<option value="{{ $d->id }}">{{ $d->nama_divisi }}</option>@endforeach</select>
                 <p class="mt-1 text-xs text-slate-400">Wajib diisi untuk role “per divisi”. User hanya melihat dokumen divisi ini.</p>
             </div>
-            <label class="flex items-center gap-3 sm:col-span-2"><input type="checkbox" name="is_active" value="1" class="h-4 w-4 rounded border-slate-300 text-indigo-600" @checked(old('is_active', $user->is_active))><span class="text-sm font-medium">Akun aktif</span></label>
+            <label class="flex items-center gap-3 sm:col-span-2"><input type="checkbox" name="is_active" value="1" class="h-4 w-4 rounded border-slate-300 text-brand-600" @checked(old('is_active', $user->is_active))><span class="text-sm font-medium">Akun aktif</span></label>
         </div>
     </section>
     <div class="flex justify-end gap-3">
         <a href="{{ route('users.index') }}" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600">Batal</a>
-        <button class="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/30">Simpan</button>
+        <button class="rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30">Simpan</button>
     </div>
 </form>
 @endsection

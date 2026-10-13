@@ -5,7 +5,7 @@
 @section('content')
 @php $u = auth()->user(); $range = $cfg['tanggal'] === 'range'; $w = $cfg['warna']; @endphp
 <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-    <a href="{{ route('dokumen.index', $jenis) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-indigo-600"><i data-lucide="arrow-left" class="h-4 w-4"></i>Kembali ke {{ $cfg['label'] }}</a>
+    <a href="{{ route('dokumen.index', $jenis) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-600"><i data-lucide="arrow-left" class="h-4 w-4"></i>Kembali ke {{ $cfg['label'] }}</a>
     <div class="flex gap-2">
         @if ($u->bisa('dokumen.ubah'))<a href="{{ route('dokumen.edit', [$jenis, $dokumen->id]) }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50"><i data-lucide="pencil" class="h-4 w-4"></i>Ubah</a>@endif
     </div>
@@ -61,7 +61,7 @@
     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="flex items-center justify-between border-b border-slate-100 px-5 py-3">
             <h3 class="font-bold">Pratinjau Dokumen</h3>
-            @if ($dokumen->link_dokumen)<a href="{{ $dokumen->link_dokumen }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:underline"><i data-lucide="external-link" class="h-3.5 w-3.5"></i>Buka di tab baru</a>@endif
+            @if ($dokumen->link_dokumen)<a href="{{ $dokumen->link_dokumen }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:underline"><i data-lucide="external-link" class="h-3.5 w-3.5"></i>Buka di tab baru</a>@endif
         </div>
         @if ($dokumen->link_dokumen)
             <iframe src="{{ $dokumen->link_embed }}" class="h-[80vh] w-full bg-slate-100"></iframe>

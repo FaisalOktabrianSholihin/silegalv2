@@ -20,7 +20,7 @@
                     <tr class="hover:bg-slate-50/70">
                         <td class="px-5 py-3">
                             <div class="flex items-center gap-3">
-                                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 text-xs font-bold text-white">{{ mb_strtoupper(mb_substr($k->nama, 0, 1)) }}</span>
+                                <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-green-500 text-xs font-bold text-white">{{ mb_strtoupper(mb_substr($k->nama, 0, 1)) }}</span>
                                 <div class="min-w-0"><div class="truncate font-semibold">{{ $k->nama }}</div><div class="truncate text-xs text-slate-400">{{ $k->email ?: '-' }}</div></div>
                             </div>
                         </td>

@@ -65,7 +65,7 @@
 
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="mb-5 flex items-center gap-3">
-            <div class="grid h-10 w-10 place-items-center rounded-xl bg-indigo-50 text-indigo-600"><i data-lucide="link" class="h-5 w-5"></i></div>
+            <div class="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600"><i data-lucide="link" class="h-5 w-5"></i></div>
             <h3 class="font-bold">Link, Rangkuman & Catatan</h3>
         </div>
         <div class="space-y-5">
@@ -106,7 +106,7 @@
 
     <div class="flex items-center justify-end gap-3">
         <a href="{{ route('dokumen.index', $jenis) }}" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">Batal</a>
-        <button class="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/30">{{ $edit ? 'Simpan Perubahan' : 'Simpan Dokumen' }}</button>
+        <button class="rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30">{{ $edit ? 'Simpan Perubahan' : 'Simpan Dokumen' }}</button>
     </div>
 </form>
 @endsection

@@ -14,7 +14,7 @@
         </div>
     </div>
     @if ($u->bisa('dokumen.tambah'))
-        <a href="{{ route('dokumen.create', $jenis) }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-xl">
+        <a href="{{ route('dokumen.create', $jenis) }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30 transition hover:shadow-xl">
             <i data-lucide="plus" class="h-4 w-4"></i>Tambah Dokumen
         </a>
     @endif
@@ -57,7 +57,7 @@
                         <td class="whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-slate-600">{{ $d->no_dokumen }}</td>
                         <td class="max-w-xs px-4 py-3.5">
                             @if ($d->link_dokumen)
-                                <button @click="$store.preview.open({url:@js($d->link_embed),raw:@js($d->link_dokumen),title:@js($d->nama_dokumen),id:{{ $d->id }}})" class="group flex items-center gap-2 text-left font-semibold text-slate-800 hover:text-indigo-600">
+                                <button @click="$store.preview.open({url:@js($d->link_embed),raw:@js($d->link_dokumen),title:@js($d->nama_dokumen),id:{{ $d->id }}})" class="group flex items-center gap-2 text-left font-semibold text-slate-800 hover:text-brand-600">
                                     <span class="truncate">{{ $d->nama_dokumen }}</span>
                                     <span class="shrink-0 rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-bold text-rose-600 group-hover:bg-rose-100">PDF</span>
                                 </button>
@@ -84,7 +84,7 @@
                                     <button @click="$store.preview.open({url:@js($d->link_embed),raw:@js($d->link_dokumen),title:@js($d->nama_dokumen),id:{{ $d->id }}})" class="rounded-lg p-2 text-rose-600 hover:bg-rose-50" title="Preview PDF"><i data-lucide="file-search" class="h-4 w-4"></i></button>
                                 @endif
                                 <a href="{{ route('dokumen.show', [$jenis, $d->id]) }}" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100" title="Detail"><i data-lucide="eye" class="h-4 w-4"></i></a>
-                                @if ($u->bisa('dokumen.ubah'))<a href="{{ route('dokumen.edit', [$jenis, $d->id]) }}" class="rounded-lg p-2 text-sky-600 hover:bg-sky-50" title="Ubah"><i data-lucide="pencil" class="h-4 w-4"></i></a>@endif
+                                @if ($u->bisa('dokumen.ubah'))<a href="{{ route('dokumen.edit', [$jenis, $d->id]) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50" title="Ubah"><i data-lucide="pencil" class="h-4 w-4"></i></a>@endif
                                 @if ($u->bisa('dokumen.hapus'))
                                     <form method="POST" action="{{ route('dokumen.destroy', [$jenis, $d->id]) }}" onsubmit="return confirm('Hapus dokumen ini?')">@csrf @method('DELETE')
                                         <button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50" title="Hapus"><i data-lucide="trash-2" class="h-4 w-4"></i></button>

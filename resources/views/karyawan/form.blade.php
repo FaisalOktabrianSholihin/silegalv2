@@ -37,7 +37,7 @@
     </section>
     <div class="flex justify-end gap-3">
         <a href="{{ route('master.karyawan.index') }}" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600">Batal</a>
-        <button class="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/30">Simpan</button>
+        <button class="rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30">Simpan</button>
     </div>
 </form>
 @endsection

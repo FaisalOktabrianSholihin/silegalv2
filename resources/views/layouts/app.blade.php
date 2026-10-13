@@ -14,7 +14,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] } } } }</script>
+    <script>tailwind.config = { theme: { extend: {
+            fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+            colors: {
+                brand: { 50:'#eef9f1',100:'#d6f0de',200:'#aee0be',300:'#7ccb97',400:'#48b06f',500:'#239456',600:'#137a45',700:'#0d6538',800:'#09572b',900:'#074b25',950:'#06401f' },
+                olive: { 50:'#f7f8ee',100:'#eceeda',200:'#d9ddb4',300:'#bfc687',400:'#a3ad5c',500:'#889340',600:'#6b7532',700:'#535b2a',800:'#444a27',900:'#3a3f25',950:'#1e2111' },
+                sage:  { 50:'#f3f7f5',100:'#e1ebe6',200:'#c5d8cf',300:'#9dbdae',400:'#77a08c',500:'#5f8f76',600:'#4a7360',700:'#3d5d4e',800:'#334c41',900:'#2b3f36',950:'#16231d' }
+            }
+        } } }</script>
     <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script>
@@ -33,13 +40,13 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <style>
         [x-cloak]{display:none!important}
-        body{background:#f4f6fb}
-        .nav-link{display:flex;align-items:center;gap:.75rem;border-radius:.75rem;padding:.55rem .75rem;font-size:.875rem;font-weight:500;color:#a5b4fc;transition:.15s}
+        body{background:#f2f8f4}
+        .nav-link{display:flex;align-items:center;gap:.75rem;border-radius:.75rem;padding:.55rem .75rem;font-size:.875rem;font-weight:500;color:#aee0be;transition:.15s}
         .nav-link:hover{background:rgba(255,255,255,.08);color:#fff}
-        .nav-link.active{background:linear-gradient(90deg,rgba(99,102,241,.95),rgba(139,92,246,.85));color:#fff;box-shadow:0 8px 20px -8px rgba(99,102,241,.8)}
-        .nav-label{padding:.25rem .75rem;margin:1.1rem 0 .35rem;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6366f1}
+        .nav-link.active{background:linear-gradient(90deg,rgba(255,255,255,.20),rgba(255,255,255,.07));color:#fff;box-shadow:inset 3px 0 0 #4ade80}
+        .nav-label{padding:.25rem .75rem;margin:1.1rem 0 .35rem;font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#7ccb97}
         .field{width:100%;border-radius:.75rem;border:1px solid #e2e8f0;background:#fff;padding:.65rem .9rem;font-size:.875rem;outline:none;transition:.15s}
-        .field:focus{border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.12)}
+        .field:focus{border-color:#239456;box-shadow:0 0 0 4px rgba(35,148,86,.12)}
         .field.err{border-color:#fb7185}
         .lbl{display:block;margin-bottom:.35rem;font-size:.8rem;font-weight:600;color:#334155}
         .sidebar-scroll::-webkit-scrollbar{width:6px}.sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:9px}
@@ -53,12 +60,12 @@
 {{-- ===== SIDEBAR ===== --}}
 <aside class="fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col text-white transition-transform duration-200 lg:translate-x-0"
        :class="sidebar && '!translate-x-0'"
-       style="background:linear-gradient(180deg,#0b1020 0%,#14124a 100%)">
+       style="background:linear-gradient(180deg,#09572b 0%,#06401f 100%)">
     <div class="flex items-center gap-3 px-6 py-5">
-        <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 shadow-lg shadow-indigo-500/40"><i data-lucide="scale" class="h-5 w-5"></i></div>
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-green-500 shadow-lg shadow-brand-500/40"><i data-lucide="scale" class="h-5 w-5"></i></div>
         <div class="leading-tight">
             <div class="text-lg font-extrabold tracking-wide">SILEGAL</div>
-            <div class="text-[10px] text-indigo-300">Sistem Informasi Legal</div>
+            <div class="text-[10px] text-brand-300">Sistem Informasi Legal</div>
         </div>
         <span class="ml-auto rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300 ring-1 ring-emerald-300/40">v2.0</span>
     </div>
@@ -107,10 +114,10 @@
 
     <div class="border-t border-white/10 p-4">
         <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
-            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 text-sm font-bold">{{ $u->inisial }}</div>
+            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-green-500 text-sm font-bold">{{ $u->inisial }}</div>
             <div class="min-w-0 leading-tight">
                 <div class="truncate text-sm font-semibold">{{ $u->name }}</div>
-                <div class="truncate text-[11px] text-indigo-300">{{ $u->role?->nama ?? 'Tanpa role' }}</div>
+                <div class="truncate text-[11px] text-brand-300">{{ $u->role?->nama ?? 'Tanpa role' }}</div>
             </div>
         </div>
     </div>
@@ -126,8 +133,8 @@
         </div>
 
         <div class="relative ml-auto" @click.outside="userMenu=false">
-            <button @click="userMenu=!userMenu" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 shadow-sm hover:border-indigo-300">
-                <span class="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-bold text-white">{{ $u->inisial }}</span>
+            <button @click="userMenu=!userMenu" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 shadow-sm hover:border-brand-300">
+                <span class="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-green-500 text-xs font-bold text-white">{{ $u->inisial }}</span>
                 <span class="hidden text-left leading-tight sm:block">
                     <span class="block text-sm font-semibold">{{ $u->name }}</span>
                     <span class="block text-[11px] text-slate-500">{{ $u->divisi?->nama_divisi ?? 'Semua Divisi' }}</span>
@@ -138,7 +145,7 @@
                 <div class="border-b border-slate-100 px-4 py-3">
                     <div class="text-sm font-semibold">{{ $u->name }}</div>
                     <div class="truncate text-xs text-slate-500">{{ $u->email }}</div>
-                    <span class="mt-2 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-600">{{ $u->role?->nama }}</span>
+                    <span class="mt-2 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-600">{{ $u->role?->nama }}</span>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">@csrf
                     <button class="flex w-full items-center gap-2 px-4 py-3 text-sm font-medium text-rose-600 hover:bg-rose-50"><i data-lucide="log-out" class="h-4 w-4"></i>Keluar</button>
@@ -180,7 +187,7 @@
         </div>
         <div class="relative flex-1 bg-slate-100">
             <div x-show="$store.preview.loading" class="absolute inset-0 grid place-items-center text-sm text-slate-500">
-                <div class="flex items-center gap-3"><svg class="h-5 w-5 animate-spin text-indigo-600" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity=".25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>Memuat dokumen…</div>
+                <div class="flex items-center gap-3"><svg class="h-5 w-5 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity=".25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>Memuat dokumen…</div>
             </div>
             <template x-if="$store.preview.show"><iframe :src="$store.preview.url" @load="$store.preview.loading=false" class="relative h-full w-full"></iframe></template>
         </div>

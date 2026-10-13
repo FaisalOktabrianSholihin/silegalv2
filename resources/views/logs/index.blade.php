@@ -3,7 +3,7 @@
 @section('subtitle', 'Jejak seluruh aktivitas pengguna di SILEGAL')
 
 @section('content')
-@php $warna = ['tambah'=>'emerald','ubah'=>'sky','hapus'=>'rose','preview'=>'violet','lihat'=>'slate','login'=>'indigo','logout'=>'slate','login_gagal'=>'rose']; @endphp
+@php $warna = ['tambah'=>'emerald','ubah'=>'teal','hapus'=>'rose','preview'=>'olive','lihat'=>'slate','login'=>'brand','logout'=>'slate','login_gagal'=>'rose']; @endphp
 <form method="GET" class="mb-4 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-6">
     <div class="lg:col-span-2"><input name="q" value="{{ request('q') }}" placeholder="Cari deskripsi…" class="field"></div>
     <select name="user_id" class="field"><option value="">Semua user</option>@foreach ($users as $x)<option value="{{ $x->id }}" @selected(request('user_id') == $x->id)>{{ $x->name }}</option>@endforeach</select>
