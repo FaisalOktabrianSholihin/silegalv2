@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
-    <form method="GET" class="grid flex-1 gap-3 sm:grid-cols-[1fr_260px_auto]">
+    <form method="GET" class="grid w-full flex-1 gap-3 sm:grid-cols-[1fr_260px_auto]">
         <div class="relative"><i data-lucide="search" class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i><input name="q" value="{{ request('q') }}" placeholder="Cari nama / NIK / email…" class="field pl-10"></div>
         <select name="divisi" class="field"><option value="">Semua divisi</option>@foreach ($divisis as $d)<option value="{{ $d->id }}" @selected(request('divisi') == $d->id)>{{ $d->nama_divisi }}</option>@endforeach</select>
         <button class="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white">Filter</button>
@@ -18,16 +18,16 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($data as $k)
                     <tr class="hover:bg-slate-50/70">
-                        <td class="px-5 py-3">
+                        <td class="min-w-[220px] max-w-[320px] px-5 py-3">
                             <div class="flex items-center gap-3">
                                 <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-green-500 text-xs font-bold text-white">{{ mb_strtoupper(mb_substr($k->nama, 0, 1)) }}</span>
-                                <div class="min-w-0"><div class="truncate font-semibold">{{ $k->nama }}</div><div class="truncate text-xs text-slate-400">{{ $k->email ?: '-' }}</div></div>
+                                <div class="min-w-0 [overflow-wrap:anywhere]"><div class="font-semibold">{{ $k->nama }}</div><div class="text-xs text-slate-400">{{ $k->email ?: '-' }}</div></div>
                             </div>
                         </td>
-                        <td class="px-4 py-3 font-mono text-xs">{{ $k->nik }}</td>
-                        <td class="px-4 py-3 text-slate-600">{{ $k->jabatan?->nama_jabatan ?? '-' }}</td>
-                        <td class="px-4 py-3 text-slate-600">{{ $k->divisi?->nama_divisi ?? '-' }}</td>
-                        <td class="px-4 py-3">
+                        <td class="whitespace-nowrap px-4 py-3 font-mono text-xs">{{ $k->nik }}</td>
+                        <td class="min-w-[140px] max-w-[240px] px-4 py-3 text-slate-600 [overflow-wrap:anywhere]">{{ $k->jabatan?->nama_jabatan ?? '-' }}</td>
+                        <td class="min-w-[140px] max-w-[240px] px-4 py-3 text-slate-600 [overflow-wrap:anywhere]">{{ $k->divisi?->nama_divisi ?? '-' }}</td>
+                        <td class="whitespace-nowrap px-4 py-3">
                             <span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $k->status_aktif === '1' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">{{ $k->status_aktif === '1' ? 'Aktif' : 'Nonaktif' }}</span>
                             <span class="ml-1 text-xs uppercase text-slate-400">{{ $k->status_pegawai }}</span>
                         </td>

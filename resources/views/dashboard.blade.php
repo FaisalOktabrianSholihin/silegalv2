@@ -83,13 +83,13 @@
 {{-- ===== Akses cepat per jenis ===== --}}
 <section class="mt-6">
     <h3 class="mb-3 font-bold">Menu Dokumen</h3>
-    <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 lg:grid-cols-4">
         @foreach ($jenisCfg as $slug => $j)
             <a href="{{ route('dokumen.index', $slug) }}" class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-{{ $j['warna'] }}-300 hover:shadow-lg">
                 <div class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-{{ $j['warna'] }}-50 text-{{ $j['warna'] }}-600 transition group-hover:scale-110"><i data-lucide="{{ $j['icon'] }}" class="h-6 w-6"></i></div>
                 <div class="min-w-0">
-                    <div class="truncate text-sm font-bold">{{ $j['label'] }}</div>
-                    <div class="text-xs text-slate-500">{{ $perJenis[$slug] ?? 0 }} dokumen</div>
+                    <div class="text-sm font-bold leading-tight [overflow-wrap:anywhere]">{{ $j['label'] }}</div>
+                    <div class="text-xs text-slate-500">{{ number_format($perJenis[$slug] ?? 0) }} dokumen</div>
                 </div>
             </a>
         @endforeach
@@ -112,7 +112,7 @@
                         <div class="truncate text-sm font-semibold">{{ $d->nama_dokumen }}</div>
                         <div class="truncate text-xs text-slate-500">{{ $d->config['label'] ?? '' }} · {{ $d->no_dokumen }} · {{ $d->divisi?->nama_divisi }}</div>
                     </div>
-                    <div class="text-right">
+                    <div class="shrink-0 text-right">
                         <div class="text-xs font-bold {{ $sisa < 0 ? 'text-rose-600' : ($sisa <= 7 ? 'text-orange-600' : 'text-amber-600') }}">
                             {{ $sisa < 0 ? 'Lewat ' . abs($sisa) . ' hari' : ($sisa === 0 ? 'Hari ini' : $sisa . ' hari lagi') }}
                         </div>
@@ -158,10 +158,10 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($terbaru as $d)
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-6 py-3"><a href="{{ route('dokumen.show', [$d->jenis, $d->id]) }}" class="font-semibold hover:text-brand-600">{{ $d->nama_dokumen }}</a><div class="text-xs text-slate-400">{{ $d->no_dokumen }}</div></td>
-                            <td class="px-4 py-3"><span class="rounded-full bg-{{ $d->config['warna'] ?? 'slate' }}-50 px-2.5 py-1 text-xs font-semibold text-{{ $d->config['warna'] ?? 'slate' }}-700">{{ $d->config['label'] ?? $d->jenis }}</span></td>
-                            <td class="px-4 py-3 text-slate-600">{{ $d->divisi?->nama_divisi ?? '-' }}</td>
+                        <tr class="align-top hover:bg-slate-50">
+                            <td class="min-w-[220px] max-w-[360px] px-6 py-3 [overflow-wrap:anywhere]"><a href="{{ route('dokumen.show', [$d->jenis, $d->id]) }}" class="font-semibold hover:text-brand-600">{{ $d->nama_dokumen }}</a><div class="text-xs text-slate-400">{{ $d->no_dokumen }}</div></td>
+                            <td class="whitespace-nowrap px-4 py-3"><span class="rounded-full bg-{{ $d->config['warna'] ?? 'slate' }}-50 px-2.5 py-1 text-xs font-semibold text-{{ $d->config['warna'] ?? 'slate' }}-700">{{ $d->config['label'] ?? $d->jenis }}</span></td>
+                            <td class="min-w-[110px] px-4 py-3 text-slate-600 [overflow-wrap:anywhere]">{{ $d->divisi?->nama_divisi ?? '-' }}</td>
                             <td class="px-4 py-3">@include('partials.status-badge', ['status' => $d->status_efektif])</td>
                             <td class="px-4 py-3 text-right">
                                 @if ($d->link_dokumen)

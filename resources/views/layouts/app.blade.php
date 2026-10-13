@@ -124,15 +124,15 @@
 </aside>
 
 {{-- ===== KONTEN ===== --}}
-<div class="lg:pl-72">
+<div class="min-w-0 lg:pl-72">
     <header class="sticky top-0 z-20 flex items-center gap-4 border-b border-slate-200/70 bg-white/80 px-4 py-3 backdrop-blur-xl sm:px-8">
         <button @click="sidebar=true" class="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"><i data-lucide="menu" class="h-5 w-5"></i></button>
-        <div class="min-w-0">
-            <h1 class="truncate text-lg font-bold text-slate-900">@yield('title', 'Dashboard')</h1>
-            <p class="hidden text-xs text-slate-500 sm:block">@yield('subtitle')</p>
+        <div class="min-w-0 flex-1">
+            <h1 class="truncate text-base font-bold text-slate-900 sm:text-lg">@yield('title', 'Dashboard')</h1>
+            <p class="hidden truncate text-xs text-slate-500 sm:block">@yield('subtitle')</p>
         </div>
 
-        <div class="relative ml-auto" @click.outside="userMenu=false">
+        <div class="relative ml-auto shrink-0" @click.outside="userMenu=false">
             <button @click="userMenu=!userMenu" class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white py-1.5 pl-1.5 pr-3 shadow-sm hover:border-brand-300">
                 <span class="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-brand-500 to-green-500 text-xs font-bold text-white">{{ $u->inisial }}</span>
                 <span class="hidden text-left leading-tight sm:block">
@@ -154,7 +154,7 @@
         </div>
     </header>
 
-    <main class="px-4 py-6 sm:px-8">
+    <main class="min-w-0 px-4 py-6 sm:px-8">
         @yield('content')
         <p class="mt-10 text-center text-xs text-slate-400">SILEGAL v2.0 · © {{ date('Y') }}</p>
     </main>

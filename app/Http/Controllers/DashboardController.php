@@ -24,7 +24,10 @@ class DashboardController extends Controller
             'kadaluarsa' => $base()->whereNotIn('status', $tutup)->whereNotNull('tanggal_akhir')->where('tanggal_akhir', '<', $today)->count(),
         ];
 
-        $perJenis = $base()->select('jenis', DB::raw('count(*) as total'))->groupBy('jenis')->pluck('total', 'jenis');
+        // Kelompokkan per slug di PHP, karena di database bisa tersimpan sebagai label ("BOM Meeting") maupun slug ("bom-meeting").
+        $perJenis = $base()->select('jenis', DB::raw('count(*) as total'))->groupBy('jenis')->get()
+            ->groupBy(fn ($r) => Dokumen::slugJenis($r->getRawOriginal('jenis')))
+            ->map(fn ($g) => (int) $g->sum('total'));
 
         // 6 bulan terakhir
         $bulan = collect(range(5, 0))->map(fn ($i) => Carbon::today()->startOfMonth()->subMonths($i));

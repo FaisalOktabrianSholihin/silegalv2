@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Dokumen extends Model
 {
@@ -25,7 +26,30 @@ class Dokumen extends Model
     public function pembuat() { return $this->belongsTo(User::class, 'dibuat_oleh'); }
     public function pihaks()  { return $this->hasMany(DokumenPihak::class)->orderBy('urutan'); }
 
-    public function scopeJenis($q, string $jenis) { return $q->where('jenis', $jenis); }
+    /**
+     * Data lama di database menyimpan jenis sebagai LABEL ("BOM Meeting", "Surat Keputusan"),
+     * sedangkan aplikasi memakai SLUG ("bom-meeting", "surat-keputusan").
+     * Method ini mengubah keduanya menjadi slug.
+     */
+    public static function slugJenis(?string $nilai): string
+    {
+        $nilai = trim((string) $nilai);
+        foreach (config('dokumen.jenis') as $slug => $c) {
+            if (strcasecmp($nilai, $slug) === 0 || strcasecmp($nilai, $c['label']) === 0) return $slug;
+        }
+        return Str::slug($nilai);
+    }
+
+    /** Daftar nilai kolom `jenis` yang dianggap sama (slug + label). */
+    public static function nilaiJenis(string $slug): array
+    {
+        return array_values(array_unique(array_filter([$slug, config("dokumen.jenis.$slug.label")])));
+    }
+
+    /** Selalu kembalikan slug, apa pun format yang tersimpan di database. */
+    public function getJenisAttribute($value): string { return self::slugJenis($value); }
+
+    public function scopeJenis($q, string $jenis) { return $q->whereIn('jenis', self::nilaiJenis($jenis)); }
 
     /** Pembatasan per divisi: user tanpa akses semua divisi hanya melihat divisinya sendiri. */
     public function scopeMilikUser($q, User $user)

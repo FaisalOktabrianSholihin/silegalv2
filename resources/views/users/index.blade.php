@@ -14,11 +14,11 @@
             <tbody class="divide-y divide-slate-100">
                 @foreach ($data as $x)
                     <tr class="hover:bg-slate-50/70">
-                        <td class="px-5 py-3"><div class="flex items-center gap-3"><span class="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-green-500 text-xs font-bold text-white">{{ $x->inisial }}</span><div><div class="font-semibold">{{ $x->name }}</div><div class="text-xs text-slate-400">{{ $x->email }}</div></div></div></td>
-                        <td class="px-4 py-3"><span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">{{ $x->role?->nama ?? '-' }}</span></td>
-                        <td class="px-4 py-3 text-slate-600">{{ $x->divisi?->nama_divisi ?? ($x->role?->akses_semua_divisi || $x->isSuperAdmin() ? 'Semua divisi' : '-') }}</td>
-                        <td class="px-4 py-3 text-xs text-slate-500">{{ $x->last_login_at?->diffForHumans() ?? 'Belum pernah' }}</td>
-                        <td class="px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $x->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600' }}">{{ $x->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
+                        <td class="min-w-[220px] max-w-[320px] px-5 py-3"><div class="flex items-center gap-3"><span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand-400 to-green-500 text-xs font-bold text-white">{{ $x->inisial }}</span><div class="min-w-0 [overflow-wrap:anywhere]"><div class="font-semibold">{{ $x->name }}</div><div class="text-xs text-slate-400">{{ $x->email }}</div></div></div></td>
+                        <td class="whitespace-nowrap px-4 py-3"><span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">{{ $x->role?->nama ?? '-' }}</span></td>
+                        <td class="min-w-[120px] px-4 py-3 text-slate-600 [overflow-wrap:anywhere]">{{ $x->divisi?->nama_divisi ?? ($x->role?->akses_semua_divisi || $x->isSuperAdmin() ? 'Semua divisi' : '-') }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-xs text-slate-500">{{ $x->last_login_at?->diffForHumans() ?? 'Belum pernah' }}</td>
+                        <td class="whitespace-nowrap px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $x->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600' }}">{{ $x->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                         <td class="px-4 py-3"><div class="flex justify-end gap-1">
                             <a href="{{ route('users.edit', $x) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50"><i data-lucide="pencil" class="h-4 w-4"></i></a>
                             @if ($x->id !== auth()->id())<form method="POST" action="{{ route('users.destroy', $x) }}" onsubmit="return confirm('Hapus user ini?')">@csrf @method('DELETE')<button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50"><i data-lucide="trash-2" class="h-4 w-4"></i></button></form>@endif

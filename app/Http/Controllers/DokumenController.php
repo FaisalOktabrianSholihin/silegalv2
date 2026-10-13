@@ -96,7 +96,7 @@ class DokumenController extends Controller
         $data = $r->validate($this->rules($r, $jenis, $cfg, $dokumen->id));
 
         DB::transaction(function () use ($data, $dokumen, $r, $cfg) {
-            $attrs = collect($data)->except('pihak', 'divisi_id')->all() + ['diubah_oleh' => auth()->id()];
+            $attrs = collect($data)->except('pihak', 'divisi_id')->all() + ['jenis' => $dokumen->jenis, 'diubah_oleh' => auth()->id()]; // jenis dirapikan ke slug
             if ($r->user()->lihatSemuaDivisi()) $attrs['divisi_id'] = $data['divisi_id'];
             if ($cfg['tanggal'] !== 'range') $attrs['tanggal_akhir'] = null;
             $dokumen->update($attrs);
@@ -133,7 +133,7 @@ class DokumenController extends Controller
         $rules = [
             'status'       => ['required', Rule::in(config('dokumen.status'))],
             'no_dokumen'   => ['required', 'string', 'max:255',
-                Rule::unique('dokumens', 'no_dokumen')->where('jenis', $jenis)->whereNull('deleted_at')->ignore($ignoreId)],
+                Rule::unique('dokumens', 'no_dokumen')->where(fn ($q) => $q->whereIn('jenis', Dokumen::nilaiJenis($jenis)))->whereNull('deleted_at')->ignore($ignoreId)],
             'nama_dokumen' => ['required', 'string', 'max:255'],
             'tanggal_awal' => ['required', 'date'],
             'lokasi'       => ['nullable', 'string', 'max:255'],
