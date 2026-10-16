@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
     <p class="max-w-xl text-sm text-slate-500">Tiap jenis dokumen otomatis menjadi menu di sidebar. Anda bisa menentukan apakah memakai <b>1 tanggal</b> atau <b>rentang tanggal</b>, serta field mana saja yang tampil di form.</p>
-    <a href="{{ route('jenis-dokumen.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30"><i data-lucide="plus" class="h-4 w-4"></i>Tambah Jenis Dokumen</a>
+    @if (auth()->user()->bisa('jenis.tambah'))<a href="{{ route('jenis-dokumen.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30"><i data-lucide="plus" class="h-4 w-4"></i>Tambah Jenis Dokumen</a>@endif
 </div>
 
 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -38,10 +38,10 @@
                         <td class="whitespace-nowrap px-4 py-3.5"><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $j->aktif ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">{{ $j->aktif ? 'Aktif' : 'Nonaktif' }}</span></td>
                         <td class="px-4 py-3.5">
                             <div class="flex justify-end gap-1">
-                                <a href="{{ route('jenis-dokumen.edit', $j) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50" title="Ubah"><i data-lucide="pencil" class="h-4 w-4"></i></a>
-                                <form method="POST" action="{{ route('jenis-dokumen.destroy', $j) }}" data-confirm="Jenis dokumen ini akan dihapus dari menu." data-judul="Hapus jenis dokumen?" data-tombol="Ya, hapus">@csrf @method('DELETE')
+                                @if (auth()->user()->bisa('jenis.ubah'))<a href="{{ route('jenis-dokumen.edit', $j) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50" title="Ubah"><i data-lucide="pencil" class="h-4 w-4"></i></a>@endif
+                                @if (auth()->user()->bisa('jenis.hapus'))<form method="POST" action="{{ route('jenis-dokumen.destroy', $j) }}" data-confirm="Jenis dokumen ini akan dihapus dari menu." data-judul="Hapus jenis dokumen?" data-tombol="Ya, hapus">@csrf @method('DELETE')
                                     <button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50" title="Hapus"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
-                                </form>
+                                </form>@endif
                             </div>
                         </td>
                     </tr>

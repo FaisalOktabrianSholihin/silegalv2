@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
     <form method="GET" class="relative w-full max-w-sm"><i data-lucide="search" class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i><input name="q" value="{{ request('q') }}" placeholder="Cari nama / email…" class="field pl-10"></form>
-    <a href="{{ route('users.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30"><i data-lucide="plus" class="h-4 w-4"></i>Tambah User</a>
+    @if (auth()->user()->bisa('user.tambah'))<a href="{{ route('users.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30"><i data-lucide="plus" class="h-4 w-4"></i>Tambah User</a>@endif
 </div>
 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
     <div class="overflow-x-auto">
@@ -20,8 +20,8 @@
                         <td class="whitespace-nowrap px-4 py-3 text-xs text-slate-500">{{ $x->last_login_at?->diffForHumans() ?? 'Belum pernah' }}</td>
                         <td class="whitespace-nowrap px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $x->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600' }}">{{ $x->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                         <td class="px-4 py-3"><div class="flex justify-end gap-1">
-                            <a href="{{ route('users.edit', $x) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50"><i data-lucide="pencil" class="h-4 w-4"></i></a>
-                            @if ($x->id !== auth()->id())<form method="POST" action="{{ route('users.destroy', $x) }}" data-confirm="Akun user ini akan dihapus dan tidak dapat masuk lagi." data-judul="Hapus user?" data-tombol="Ya, hapus">@csrf @method('DELETE')<button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50"><i data-lucide="trash-2" class="h-4 w-4"></i></button></form>@endif
+                            @if (auth()->user()->bisa('user.ubah'))<a href="{{ route('users.edit', $x) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50"><i data-lucide="pencil" class="h-4 w-4"></i></a>@endif
+                            @if ($x->id !== auth()->id() && auth()->user()->bisa('user.hapus'))<form method="POST" action="{{ route('users.destroy', $x) }}" data-confirm="Akun user ini akan dihapus dan tidak dapat masuk lagi." data-judul="Hapus user?" data-tombol="Ya, hapus">@csrf @method('DELETE')<button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50"><i data-lucide="trash-2" class="h-4 w-4"></i></button></form>@endif
                         </div></td>
                     </tr>
                 @endforeach

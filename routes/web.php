@@ -15,21 +15,31 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // ---------- Master Data ----------
-    Route::middleware('izin:master.kelola')->prefix('master')->name('master.')->group(function () {
+    Route::middleware('izin:master.lihat')->prefix('master')->name('master.')->group(function () {
         // Divisi & Karyawan dibaca dari db_indukk (read-only)
         Route::get('divisi', [DivisiController::class, 'index'])->name('divisi.index');
         Route::get('karyawan', [KaryawanController::class, 'index'])->name('karyawan.index');
     });
-    Route::middleware('izin:user.kelola')->prefix('master')->group(function () {
-        Route::resource('users', UserController::class)->except(['show']);
+    Route::prefix('master')->group(function () {
+        Route::resource('users', UserController::class)->only(['index'])->middleware('izin:user.lihat');
+        Route::resource('users', UserController::class)->only(['create', 'store'])->middleware('izin:user.tambah');
+        Route::resource('users', UserController::class)->only(['edit', 'update'])->middleware('izin:user.ubah');
+        Route::resource('users', UserController::class)->only(['destroy'])->middleware('izin:user.hapus');
     });
 
-    Route::middleware('izin:jenis.kelola')->prefix('master')->group(function () {
-        Route::resource('jenis-dokumen', JenisDokumenController::class)->parameters(['jenis-dokumen' => 'jenis'])->except(['show']);
+    Route::prefix('master')->group(function () {
+        $jd = fn () => Route::resource('jenis-dokumen', JenisDokumenController::class)->parameters(['jenis-dokumen' => 'jenis']);
+        $jd()->only(['index'])->middleware('izin:jenis.lihat');
+        $jd()->only(['create', 'store'])->middleware('izin:jenis.tambah');
+        $jd()->only(['edit', 'update'])->middleware('izin:jenis.ubah');
+        $jd()->only(['destroy'])->middleware('izin:jenis.hapus');
     });
 
     // ---------- Roles & Log ----------
-    Route::middleware('izin:role.kelola')->resource('roles', RoleController::class)->except(['show']);
+    Route::resource('roles', RoleController::class)->only(['index'])->middleware('izin:role.lihat');
+    Route::resource('roles', RoleController::class)->only(['create', 'store'])->middleware('izin:role.tambah');
+    Route::resource('roles', RoleController::class)->only(['edit', 'update'])->middleware('izin:role.ubah');
+    Route::resource('roles', RoleController::class)->only(['destroy'])->middleware('izin:role.hapus');
     Route::middleware('izin:log.lihat')->get('/log-aktivitas', [LogAktivitasController::class, 'index'])->name('log.index');
 
     // ---------- Dokumen ----------

@@ -1,5 +1,20 @@
 <?php
 
+$modul = [
+    'dokumen' => ['label' => 'Dokumen', 'ket' => 'Semua jenis dokumen (Kontrak, Perizinan, dst.)', 'icon' => 'folders',
+                  'aksi' => ['lihat', 'tambah', 'ubah', 'hapus'], 'terkunci' => ['lihat']],
+    'master'  => ['label' => 'Divisi & Karyawan', 'ket' => 'Master Data bawaan (hanya baca)', 'icon' => 'network',
+                  'aksi' => ['lihat'], 'terkunci' => []],
+    'user'    => ['label' => 'User', 'ket' => 'Akun pengguna aplikasi', 'icon' => 'user-cog',
+                  'aksi' => ['lihat', 'tambah', 'ubah', 'hapus'], 'terkunci' => []],
+    'jenis'   => ['label' => 'Jenis Dokumen', 'ket' => 'Pengaturan jenis & menu dokumen', 'icon' => 'layers',
+                  'aksi' => ['lihat', 'tambah', 'ubah', 'hapus'], 'terkunci' => []],
+    'role'    => ['label' => 'Roles', 'ket' => 'Hak akses & cakupan divisi', 'icon' => 'shield-check',
+                  'aksi' => ['lihat', 'tambah', 'ubah', 'hapus'], 'terkunci' => []],
+    'log'     => ['label' => 'Log Aktivitas', 'ket' => 'Riwayat aktivitas seluruh user', 'icon' => 'history',
+                  'aksi' => ['lihat'], 'terkunci' => []],
+];
+
 return [
 
     // JENIS BAWAAN (hanya dipakai sebagai data awal saat migrasi / cadangan jika tabel belum ada).
@@ -37,15 +52,19 @@ return [
     // Dokumen dengan tanggal akhir <= N hari dianggap "Segera Berakhir"
     'warning_days' => 30,
 
-    // Daftar izin yang bisa dicentang di menu Roles
-    'izin' => [
-        'dokumen.tambah' => 'Tambah dokumen',
-        'dokumen.ubah'   => 'Ubah dokumen',
-        'dokumen.hapus'  => 'Hapus dokumen',
-        'master.kelola'  => 'Kelola Master Data (Divisi & Karyawan)',
-        'user.kelola'    => 'Kelola User',
-        'role.kelola'    => 'Kelola Roles',
-        'jenis.kelola'   => 'Kelola Jenis Dokumen',
-        'log.lihat'      => 'Lihat Log Aktivitas (semua user)',
-    ],
+    // Matriks izin di menu Roles: tiap modul punya aksi Lihat / Tambah / Ubah / Hapus.
+    // 'terkunci' = aksi yang selalu aktif untuk semua role (tidak disimpan, tidak bisa dimatikan).
+    // Kunci izin tersimpan berbentuk "modul.aksi", mis. user.tambah, dokumen.ubah.
+    'modul' => $modul,
+
+    // Daftar datar semua kunci izin (dihitung dari 'modul'): ['user.tambah' => 'Tambah User', ...]
+    'izin' => (function () use ($modul) {
+        $out = [];
+        foreach ($modul as $k => $m) {
+            foreach ($m['aksi'] as $x) {
+                if (! in_array($x, $m['terkunci'])) $out["$k.$x"] = ucfirst($x) . ' ' . $m['label'];
+            }
+        }
+        return $out;
+    })(),
 ];

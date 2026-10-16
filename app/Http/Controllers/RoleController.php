@@ -57,7 +57,15 @@ class RoleController extends Controller
             'izin'      => 'nullable|array',
             'izin.*'    => Rule::in(array_keys(config('dokumen.izin'))),
         ]);
-        $data['izin'] = $data['izin'] ?? [];
+        $izin = $data['izin'] ?? [];
+        // Aksi tambah/ubah/hapus pada suatu modul otomatis membutuhkan izin "lihat" modul itu
+        foreach (config('dokumen.modul') as $mk => $m) {
+            if (! in_array('lihat', $m['aksi']) || in_array('lihat', $m['terkunci'])) continue;
+            foreach ($m['aksi'] as $x) {
+                if ($x !== 'lihat' && in_array("$mk.$x", $izin)) { $izin[] = "$mk.lihat"; break; }
+            }
+        }
+        $data['izin'] = array_values(array_unique($izin));
         $data['akses_semua_divisi'] = $r->boolean('akses_semua_divisi');
         return $data;
     }

@@ -57,7 +57,7 @@ class DashboardController extends Controller
             ->when(! $u->bisa('log.lihat'), fn ($q) => $q->where('user_id', $u->id))
             ->latest('id')->limit(7)->get();
 
-        $master = $u->bisa('master.kelola') ? [
+        $master = $u->bisa('master.lihat') ? [
             'karyawan' => Karyawan::count(), 'divisi' => Divisi::count(), 'user' => User::count(),
         ] : null;
 

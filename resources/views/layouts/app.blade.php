@@ -88,21 +88,21 @@
     <nav class="sidebar-scroll flex-1 overflow-y-auto px-4 pb-6">
         <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i data-lucide="layout-dashboard" class="h-[18px] w-[18px]"></i>Dashboard</a>
 
-        @if ($u->bisa('master.kelola') || $u->bisa('user.kelola') || $u->bisa('jenis.kelola'))
+        @if ($u->bisa('master.lihat') || $u->bisa('user.lihat') || $u->bisa('jenis.lihat'))
             <div class="nav-label">Master Data</div>
             <button @click="master=!master" class="nav-link w-full {{ $menuMaster ? 'text-white' : '' }}">
                 <i data-lucide="database" class="h-[18px] w-[18px]"></i>Master Data
                 <i data-lucide="chevron-down" class="ml-auto h-4 w-4 transition" :class="master && 'rotate-180'"></i>
             </button>
             <div x-show="master" x-collapse x-cloak class="ml-5 mt-1 space-y-1 border-l border-white/10 pl-3">
-                @if ($u->bisa('master.kelola'))
+                @if ($u->bisa('master.lihat'))
                     <a href="{{ route('master.divisi.index') }}" class="nav-link {{ request()->routeIs('master.divisi.*') ? 'active' : '' }}"><i data-lucide="network" class="h-4 w-4"></i>Divisi</a>
                     <a href="{{ route('master.karyawan.index') }}" class="nav-link {{ request()->routeIs('master.karyawan.*') ? 'active' : '' }}"><i data-lucide="id-card" class="h-4 w-4"></i>Karyawan</a>
                 @endif
-                @if ($u->bisa('user.kelola'))
+                @if ($u->bisa('user.lihat'))
                     <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}"><i data-lucide="user-cog" class="h-4 w-4"></i>User</a>
                 @endif
-                @if ($u->bisa('jenis.kelola'))
+                @if ($u->bisa('jenis.lihat'))
                     <a href="{{ route('jenis-dokumen.index') }}" class="nav-link {{ request()->routeIs('jenis-dokumen.*') ? 'active' : '' }}"><i data-lucide="layers" class="h-4 w-4"></i>Jenis Dokumen</a>
                 @endif
             </div>
@@ -119,9 +119,9 @@
             @endforeach
         </div>
 
-        @if ($u->bisa('role.kelola') || $u->bisa('log.lihat'))
+        @if ($u->bisa('role.lihat') || $u->bisa('log.lihat'))
             <div class="nav-label">Administrasi</div>
-            @if ($u->bisa('role.kelola'))
+            @if ($u->bisa('role.lihat'))
                 <a href="{{ route('roles.index') }}" class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}"><i data-lucide="shield-check" class="h-[18px] w-[18px]"></i>Roles</a>
             @endif
             @if ($u->bisa('log.lihat'))
