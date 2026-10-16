@@ -80,7 +80,54 @@
                 @error('link_dokumen')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
             </div>
             @endif
-            @if ($cfg['rangkuman'])<div><label class="lbl">Rangkuman</label><textarea name="rangkuman" rows="4" class="field" placeholder="Ringkasan isi dokumen…">{{ old('rangkuman', $dokumen->rangkuman) }}</textarea></div>@endif
+            @if ($cfg['rangkuman'])
+            <div x-data="{
+                    mode: @js(old('rangkuman_mode', 'manual')), teks: @js(old('rangkuman', $dokumen->rangkuman) ?? ''), loading: false, err: '',
+                    async buat() {
+                        this.err = ''; this.loading = true;
+                        try {
+                            const r = await fetch(@js(route('dokumen.rangkuman-ai', $jenis)), {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
+                                body: JSON.stringify({
+                                    link_dokumen: document.querySelector('[name=link_dokumen]')?.value || '',
+                                    nama_dokumen: document.querySelector('[name=nama_dokumen]')?.value || ''
+                                })
+                            });
+                            const j = await r.json().catch(() => ({}));
+                            if (!r.ok) this.err = j.pesan || (j.errors ? Object.values(j.errors)[0][0] : 'Gagal membuat rangkuman.');
+                            else this.teks = j.rangkuman;
+                        } catch (e) { this.err = 'Tidak dapat terhubung ke server.'; }
+                        this.loading = false;
+                    }
+                }">
+                <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <label class="lbl !mb-0">Rangkuman</label>
+                    <div class="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-semibold">
+                        <button type="button" @click="mode='manual'" :class="mode==='manual' ? 'bg-white text-slate-900 shadow' : 'text-slate-500'" class="rounded-lg px-3 py-1.5 transition">Manual</button>
+                        <button type="button" @click="mode='ai'" :class="mode==='ai' ? 'bg-white text-brand-700 shadow' : 'text-slate-500'" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition">
+                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg>Otomatis (AI)
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="rangkuman_mode" :value="mode">
+
+                <div x-show="mode==='ai'" x-cloak x-transition class="mb-3 rounded-xl border border-brand-200 bg-brand-50/60 p-3 text-xs text-brand-800">
+                    @if (\App\Support\RangkumanAi::tersedia())
+                        <p>AI membaca PDF dari <b>Link Dokumen</b> lalu menyusun rangkuman. Klik tombol di bawah untuk melihat hasilnya dulu, atau langsung simpan dan rangkuman dibuat otomatis jika kolom masih kosong.</p>
+                        <button type="button" @click="buat()" :disabled="loading" class="mt-2 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3.5 py-2 text-xs font-bold text-white shadow hover:bg-brand-700 disabled:opacity-60">
+                            <svg x-show="loading" class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity=".25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+                            <span x-text="loading ? 'AI sedang membaca dokumen…' : (teks ? 'Buat ulang dengan AI' : 'Buat rangkuman sekarang')"></span>
+                        </button>
+                    @else
+                        <p><b>Fitur AI belum aktif.</b> Minta administrator mengisi <code>GEMINI_API_KEY</code> di file .env, atau gunakan mode Manual.</p>
+                    @endif
+                    <p x-show="err" x-text="err" class="mt-2 font-semibold text-rose-600"></p>
+                </div>
+
+                <textarea name="rangkuman" x-model="teks" rows="5" class="field" :placeholder="mode==='ai' ? 'Hasil rangkuman AI muncul di sini dan masih bisa Anda edit…' : 'Ringkasan isi dokumen…'"></textarea>
+            </div>
+            @endif
             @if ($cfg['catatan'])<div><label class="lbl">Catatan</label><textarea name="catatan" rows="3" class="field" placeholder="Catatan tambahan…">{{ old('catatan', $dokumen->catatan) }}</textarea></div>@endif
         </div>
     </section>

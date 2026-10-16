@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\{Dokumen, Divisi, JenisDokumen};
-use App\Support\Aktivitas;
+use App\Support\{Aktivitas, RangkumanAi};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -62,16 +62,18 @@ class DokumenController extends Controller
         $this->pastikanAktif($cfg);
         $data = $r->validate($this->rules($r, $jenis, $cfg));
         $divisiId = $this->tentukanDivisi($r, $data);
+        $peringatanAi = $this->rangkumanOtomatis($data, $cfg);
 
         $dokumen = DB::transaction(function () use ($data, $jenis, $divisiId, $cfg) {
-            $d = Dokumen::create(collect($data)->except('pihak', 'divisi_id')->all()
+            $d = Dokumen::create(collect($data)->except('pihak', 'divisi_id', 'rangkuman_mode')->all()
                 + ['jenis' => $jenis, 'divisi_id' => $divisiId, 'dibuat_oleh' => auth()->id()]);
             if ($cfg['pihak']) $this->simpanPihak($d, $data['pihak'] ?? []);
             return $d;
         });
 
         Aktivitas::catat('tambah', $cfg['label'], "Menambah {$cfg['label']}: {$dokumen->no_dokumen} - {$dokumen->nama_dokumen}", $dokumen->id);
-        return redirect()->route('dokumen.index', $jenis)->with('sukses', "{$cfg['label']} berhasil ditambahkan.");
+        return redirect()->route('dokumen.index', $jenis)->with('sukses', "{$cfg['label']} berhasil ditambahkan.")
+            ->with('gagal', $peringatanAi);
     }
 
     public function show(string $jenis, Dokumen $dokumen)
@@ -101,9 +103,10 @@ class DokumenController extends Controller
         $cfg = $this->cfg($jenis);
         $this->otorisasi($dokumen, $jenis);
         $data = $r->validate($this->rules($r, $jenis, $cfg, $dokumen->id));
+        $peringatanAi = $this->rangkumanOtomatis($data, $cfg);
 
         DB::transaction(function () use ($data, $dokumen, $r, $cfg) {
-            $attrs = collect($data)->except('pihak', 'divisi_id')->all() + ['jenis' => $dokumen->jenis, 'diubah_oleh' => auth()->id()]; // jenis dirapikan ke slug
+            $attrs = collect($data)->except('pihak', 'divisi_id', 'rangkuman_mode')->all() + ['jenis' => $dokumen->jenis, 'diubah_oleh' => auth()->id()]; // jenis dirapikan ke slug
             if ($r->user()->lihatSemuaDivisi()) $attrs['divisi_id'] = $data['divisi_id'];
             if ($cfg['tanggal'] !== 'range') $attrs['tanggal_akhir'] = null;
             $dokumen->update($attrs);
@@ -111,7 +114,8 @@ class DokumenController extends Controller
         });
 
         Aktivitas::catat('ubah', $cfg['label'], "Mengubah {$cfg['label']}: {$dokumen->no_dokumen} - {$dokumen->nama_dokumen}", $dokumen->id);
-        return redirect()->route('dokumen.index', $jenis)->with('sukses', "{$cfg['label']} berhasil diperbarui.");
+        return redirect()->route('dokumen.index', $jenis)->with('sukses', "{$cfg['label']} berhasil diperbarui.")
+            ->with('gagal', $peringatanAi);
     }
 
     public function destroy(string $jenis, Dokumen $dokumen)
@@ -123,6 +127,41 @@ class DokumenController extends Controller
 
         Aktivitas::catat('hapus', $cfg['label'], "Menghapus {$cfg['label']}: {$dokumen->no_dokumen} - {$dokumen->nama_dokumen}", $dokumen->id);
         return redirect()->route('dokumen.index', $jenis)->with('sukses', "{$cfg['label']} berhasil dihapus.");
+    }
+
+    /** Dipanggil via fetch dari tombol "Buat rangkuman" di form (hasilnya bisa diedit sebelum disimpan). */
+    public function rangkumanAi(Request $r, string $jenis)
+    {
+        $cfg = $this->cfg($jenis);
+        abort_unless($r->user()->bisa('dokumen.tambah') || $r->user()->bisa('dokumen.ubah'), 403);
+        abort_unless($cfg['rangkuman'] && $cfg['link'], 404);
+        $d = $r->validate(['link_dokumen' => ['required', 'url', 'max:1000'], 'nama_dokumen' => ['nullable', 'string', 'max:255']],
+            ['link_dokumen.required' => 'Isi Link Dokumen (PDF) terlebih dahulu.', 'link_dokumen.url' => 'Link Dokumen tidak valid.']);
+
+        try {
+            $teks = RangkumanAi::buat($d['link_dokumen'], $d['nama_dokumen'] ?? null);
+        } catch (\RuntimeException $e) {
+            return response()->json(['pesan' => $e->getMessage()], 422);
+        }
+        Aktivitas::catat('ai', $cfg['label'], "Membuat rangkuman AI untuk {$cfg['label']}: " . ($d['nama_dokumen'] ?? $d['link_dokumen']));
+        return response()->json(['rangkuman' => $teks]);
+    }
+
+    /**
+     * Mode "Otomatis (AI)": jika rangkuman masih kosong saat disimpan, buat dari link dokumen.
+     * Kegagalan AI tidak membatalkan penyimpanan; kembalikan pesan peringatan (atau null).
+     */
+    private function rangkumanOtomatis(array &$data, array $cfg): ?string
+    {
+        if (! $cfg['rangkuman'] || ($data['rangkuman_mode'] ?? 'manual') !== 'ai' || filled($data['rangkuman'] ?? null)) return null;
+        if (blank($data['link_dokumen'] ?? null)) return 'Rangkuman AI dilewati karena Link Dokumen kosong. Dokumen tetap disimpan.';
+
+        try {
+            $data['rangkuman'] = RangkumanAi::buat($data['link_dokumen'], $data['nama_dokumen'] ?? null);
+            return null;
+        } catch (\RuntimeException $e) {
+            return 'Dokumen tersimpan, tetapi rangkuman AI gagal: ' . $e->getMessage();
+        }
     }
 
     /** Dipanggil via fetch saat modal preview PDF dibuka. */
@@ -149,7 +188,7 @@ class DokumenController extends Controller
         if ($cfg['lokasi'])    $rules['lokasi']       = ['nullable', 'string', 'max:255'];
         if ($cfg['catatan'])   $rules['catatan']      = ['nullable', 'string'];
         if ($cfg['link'])      $rules['link_dokumen'] = ['nullable', 'url', 'max:1000'];
-        if ($cfg['rangkuman']) $rules['rangkuman']    = ['nullable', 'string'];
+        if ($cfg['rangkuman']) { $rules['rangkuman'] = ['nullable', 'string']; $rules['rangkuman_mode'] = ['nullable', 'in:manual,ai']; }
 
         if ($cfg['tanggal'] === 'range') {
             $rules['tanggal_akhir'] = ['required', 'date', 'after_or_equal:tanggal_awal'];

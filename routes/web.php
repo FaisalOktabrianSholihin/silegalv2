@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
         ->where(['jenis' => '[a-z0-9]+(?:-[a-z0-9]+)*']) // slug valid; jenis yang tidak ada -> 404 di controller
         ->group(function () {
             Route::get('/', [DokumenController::class, 'index'])->name('index');
+            Route::post('/rangkuman-ai', [DokumenController::class, 'rangkumanAi'])->middleware('throttle:10,1')->name('rangkuman-ai');
             Route::get('/tambah', [DokumenController::class, 'create'])->middleware('izin:dokumen.tambah')->name('create');
             Route::post('/', [DokumenController::class, 'store'])->middleware('izin:dokumen.tambah')->name('store');
             Route::get('/{dokumen}', [DokumenController::class, 'show'])->whereNumber('dokumen')->name('show');
