@@ -26,7 +26,7 @@
                     [$range ? 'Tanggal Awal' : 'Tanggal Dokumen', $dokumen->tanggal_awal?->translatedFormat('d F Y')],
                     ...($range ? [['Tanggal Akhir', $dokumen->tanggal_akhir?->translatedFormat('d F Y')]] : []),
                     ...($cfg['lokasi'] ? [['Lokasi', $dokumen->lokasi ?: '-']] : []),
-                    ['Dibuat oleh', ($dokumen->pembuat?->name ?? '-') . ' · ' . $dokumen->created_at->translatedFormat('d M Y H:i')],
+                    ['Dibuat oleh', ($dokumen->pembuat?->name ?? '-') . ' · ' . $dokumen->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y H:i') . ' WIB'],
                 ] as [$k, $v])
                     <div class="flex justify-between gap-4 border-b border-slate-100 pb-2"><dt class="shrink-0 text-slate-500">{{ $k }}</dt><dd class="min-w-0 text-right font-semibold [overflow-wrap:anywhere]">{{ $v }}</dd></div>
                 @endforeach

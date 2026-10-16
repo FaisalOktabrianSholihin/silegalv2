@@ -20,7 +20,7 @@
                 @forelse ($data as $l)
                     @php $c = $warna[$l->aksi] ?? 'slate'; @endphp
                     <tr class="align-top hover:bg-slate-50/70">
-                        <td class="whitespace-nowrap px-5 py-3 text-xs text-slate-500">{{ $l->created_at->translatedFormat('d M Y H:i:s') }}</td>
+                        <td class="whitespace-nowrap px-5 py-3 text-xs text-slate-500">{{ $l->created_at->timezone('Asia/Jakarta')->translatedFormat('d M Y H:i:s') }} WIB</td>
                         <td class="whitespace-nowrap px-4 py-3 font-semibold">{{ $l->user?->name ?? 'Tidak dikenal' }}</td>
                         <td class="whitespace-nowrap px-4 py-3"><span class="rounded-full bg-{{ $c }}-50 px-2.5 py-1 text-xs font-bold text-{{ $c }}-700">{{ $l->aksi }}</span></td>
                         <td class="whitespace-nowrap px-4 py-3 text-slate-600">{{ $l->modul }}</td>

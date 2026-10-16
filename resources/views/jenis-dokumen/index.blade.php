@@ -39,7 +39,7 @@
                         <td class="px-4 py-3.5">
                             <div class="flex justify-end gap-1">
                                 <a href="{{ route('jenis-dokumen.edit', $j) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50" title="Ubah"><i data-lucide="pencil" class="h-4 w-4"></i></a>
-                                <form method="POST" action="{{ route('jenis-dokumen.destroy', $j) }}" onsubmit="return confirm('Hapus jenis dokumen ini?')">@csrf @method('DELETE')
+                                <form method="POST" action="{{ route('jenis-dokumen.destroy', $j) }}" data-confirm="Jenis dokumen ini akan dihapus dari menu." data-judul="Hapus jenis dokumen?" data-tombol="Ya, hapus">@csrf @method('DELETE')
                                     <button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50" title="Hapus"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
                                 </form>
                             </div>

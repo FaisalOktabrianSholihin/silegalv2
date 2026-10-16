@@ -10,7 +10,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Dashboard') · SILEGAL v2</title>
+    <title>@yield('title', 'Dashboard')</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="alternate icon" href="{{ asset('favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,6 +28,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script>
         document.addEventListener('alpine:init', () => {
+            Alpine.store('dialog', {
+                show: false, judul: '', pesan: '', tombol: 'Ya, lanjutkan', tipe: 'bahaya', form: null,
+                buka(form) {
+                    this.form = form;
+                    this.judul = form.dataset.judul || 'Konfirmasi';
+                    this.pesan = form.dataset.confirm || 'Yakin ingin melanjutkan?';
+                    this.tombol = form.dataset.tombol || 'Ya, lanjutkan';
+                    this.tipe = form.dataset.tipe || 'bahaya';
+                    this.show = true;
+                },
+                batal() { this.show = false; this.form = null; },
+                ya() { const f = this.form; this.show = false; this.form = null; if (f) { f.dataset.confirmed = '1'; f.requestSubmit ? f.requestSubmit() : f.submit(); } }
+            });
             Alpine.store('preview', {
                 show: false, url: '', raw: '', title: '', loading: false,
                 open(o) {
@@ -198,7 +213,42 @@
     </div>
 </div>
 
-<script>document.addEventListener('DOMContentLoaded', () => lucide.createIcons());</script>
+{{-- ===== DIALOG KONFIRMASI (pengganti confirm() bawaan browser) ===== --}}
+<div x-data x-show="$store.dialog.show" x-cloak @keydown.escape.window="$store.dialog.batal()"
+     x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+     class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+    <div @click.outside="$store.dialog.batal()" x-show="$store.dialog.show"
+         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="scale-95 opacity-0" x-transition:enter-end="scale-100 opacity-100"
+         class="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="px-6 pb-2 pt-6 text-center">
+            <div class="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full"
+                 :class="$store.dialog.tipe === 'bahaya' ? 'bg-rose-50 text-rose-500 ring-8 ring-rose-50/60' : 'bg-brand-50 text-brand-600 ring-8 ring-brand-50/60'">
+                <svg x-show="$store.dialog.tipe === 'bahaya'" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                <svg x-show="$store.dialog.tipe !== 'bahaya'" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </div>
+            <h3 class="text-lg font-extrabold text-slate-900" x-text="$store.dialog.judul"></h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-500" x-text="$store.dialog.pesan"></p>
+        </div>
+        <div class="flex gap-3 px-6 pb-6 pt-5">
+            <button type="button" @click="$store.dialog.batal()" class="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Batal</button>
+            <button type="button" @click="$store.dialog.ya()" x-text="$store.dialog.tombol"
+                    class="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-lg transition"
+                    :class="$store.dialog.tipe === 'bahaya' ? 'bg-rose-600 shadow-rose-500/30 hover:bg-rose-700' : 'bg-brand-600 shadow-brand-500/30 hover:bg-brand-700'"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
+    // Form ber-atribut data-confirm akan memunculkan dialog buatan sendiri, bukan confirm() bawaan browser.
+    document.addEventListener('submit', (e) => {
+        const f = e.target;
+        if (!f.dataset || !f.dataset.confirm || f.dataset.confirmed === '1') return;
+        e.preventDefault();
+        Alpine.store('dialog').buka(f);
+    }, true);
+</script>
 @stack('scripts')
 </body>
 </html>

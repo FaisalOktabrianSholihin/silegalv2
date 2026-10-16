@@ -22,7 +22,7 @@
     <div class="pointer-events-none absolute -right-8 -top-8 opacity-10"><i data-lucide="scale" class="h-56 w-56"></i></div>
     <div class="relative flex flex-wrap items-end justify-between gap-6">
         <div>
-            <p class="text-sm text-brand-200">{{ now()->translatedFormat('l, d F Y') }}</p>
+            <p class="text-sm text-brand-200">{{ now()->timezone('Asia/Jakarta')->translatedFormat('l, d F Y') }} · <span x-data="{ t: '' }" x-init="const u=()=>t=new Date().toLocaleTimeString('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replace(/\./g,':');u();setInterval(u,1000)" x-text="t + ' WIB'"></span></p>
             <h2 class="mt-1 text-2xl font-extrabold sm:text-3xl">Halo, {{ $u->name }} 👋</h2>
             <div class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
                 <span class="rounded-full bg-white/15 px-3 py-1 ring-1 ring-white/25">{{ $u->role?->nama }}</span>

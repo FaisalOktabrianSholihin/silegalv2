@@ -24,7 +24,7 @@
 <form method="GET" class="mb-4 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-[1fr_180px_240px_auto]">
     <div class="relative">
         <i data-lucide="search" class="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
-        <input name="q" value="{{ request('q') }}" placeholder="Cari no / nama dokumen / lokasi…" class="field pl-10">
+        <input name="q" value="{{ request('q') }}" placeholder="Cari apa saja: no, nama, lokasi, divisi, tanggal, pihak, catatan…" class="field pl-10">
     </div>
     <select name="status" class="field"><option value="">Semua status</option>@foreach ($statuses as $s)<option @selected(request('status') === $s)>{{ $s }}</option>@endforeach</select>
     @if ($u->lihatSemuaDivisi())

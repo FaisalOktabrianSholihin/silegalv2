@@ -34,8 +34,7 @@ class DokumenController extends Controller
         $u = $r->user();
 
         $data = Dokumen::jenis($jenis)->milikUser($u)->with('divisi')
-            ->when($r->q, fn ($q, $s) => $q->where(fn ($w) => $w->where('no_dokumen', 'like', "%$s%")
-                ->orWhere('nama_dokumen', 'like', "%$s%")->orWhere('lokasi', 'like', "%$s%")))
+            ->when($r->q, fn ($q, $s) => $q->cari($s))
             ->when($r->status, fn ($q, $s) => $q->where('status', $s))
             ->when($u->lihatSemuaDivisi() && $r->divisi, fn ($q) => $q->where('divisi_id', $r->divisi))
             ->latest('id')->paginate(10)->withQueryString();

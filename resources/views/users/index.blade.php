@@ -21,7 +21,7 @@
                         <td class="whitespace-nowrap px-4 py-3"><span class="rounded-full px-2.5 py-1 text-xs font-semibold {{ $x->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600' }}">{{ $x->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                         <td class="px-4 py-3"><div class="flex justify-end gap-1">
                             <a href="{{ route('users.edit', $x) }}" class="rounded-lg p-2 text-teal-600 hover:bg-teal-50"><i data-lucide="pencil" class="h-4 w-4"></i></a>
-                            @if ($x->id !== auth()->id())<form method="POST" action="{{ route('users.destroy', $x) }}" onsubmit="return confirm('Hapus user ini?')">@csrf @method('DELETE')<button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50"><i data-lucide="trash-2" class="h-4 w-4"></i></button></form>@endif
+                            @if ($x->id !== auth()->id())<form method="POST" action="{{ route('users.destroy', $x) }}" data-confirm="Akun user ini akan dihapus dan tidak dapat masuk lagi." data-judul="Hapus user?" data-tombol="Ya, hapus">@csrf @method('DELETE')<button class="rounded-lg p-2 text-rose-500 hover:bg-rose-50"><i data-lucide="trash-2" class="h-4 w-4"></i></button></form>@endif
                         </div></td>
                     </tr>
                 @endforeach

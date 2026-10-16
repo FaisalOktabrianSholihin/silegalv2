@@ -18,7 +18,7 @@
             </div>
             <div class="mt-5 flex justify-end gap-1 border-t border-slate-100 pt-3">
                 <a href="{{ route('roles.edit', $r) }}" class="rounded-lg px-3 py-1.5 text-xs font-semibold text-teal-600 hover:bg-teal-50">Ubah</a>
-                @if ($r->slug !== 'super-admin')<form method="POST" action="{{ route('roles.destroy', $r) }}" onsubmit="return confirm('Hapus role ini?')">@csrf @method('DELETE')<button class="rounded-lg px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button></form>@endif
+                @if ($r->slug !== 'super-admin')<form method="POST" action="{{ route('roles.destroy', $r) }}" data-confirm="Role ini akan dihapus secara permanen." data-judul="Hapus role?" data-tombol="Ya, hapus">@csrf @method('DELETE')<button class="rounded-lg px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50">Hapus</button></form>@endif
             </div>
         </div>
     @endforeach
