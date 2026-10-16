@@ -1,6 +1,6 @@
 {{-- Param: $d (Dokumen), $jenis (slug), $u (User) --}}
 <div class="flex items-center justify-end gap-1">
-    @if ($d->link_dokumen)
+    @if (($d->config['link'] ?? true) && $d->link_dokumen)
         <button type="button" @click="$store.preview.open({url:@js($d->link_embed),raw:@js($d->link_dokumen),title:@js($d->nama_dokumen),id:{{ $d->id }}})" class="rounded-lg p-2 text-rose-600 hover:bg-rose-50" title="Preview PDF"><i data-lucide="file-search" class="h-4 w-4"></i></button>
     @endif
     <a href="{{ route('dokumen.show', [$jenis, $d->id]) }}" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100" title="Detail"><i data-lucide="eye" class="h-4 w-4"></i></a>

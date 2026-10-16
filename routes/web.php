@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\{AuthController, DashboardController, DokumenController, DivisiController,
-    KaryawanController, UserController, RoleController, LogAktivitasController};
+    KaryawanController, UserController, RoleController, LogAktivitasController, JenisDokumenController};
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
     });
 
+    Route::middleware('izin:jenis.kelola')->prefix('master')->group(function () {
+        Route::resource('jenis-dokumen', JenisDokumenController::class)->parameters(['jenis-dokumen' => 'jenis'])->except(['show']);
+    });
+
     // ---------- Roles & Log ----------
     Route::middleware('izin:role.kelola')->resource('roles', RoleController::class)->except(['show']);
     Route::middleware('izin:log.lihat')->get('/log-aktivitas', [LogAktivitasController::class, 'index'])->name('log.index');
@@ -32,7 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/dokumen-preview/{dokumen}', [DokumenController::class, 'catatPreview'])->name('dokumen.preview-log');
 
     Route::prefix('dokumen/{jenis}')->name('dokumen.')
-        ->where(['jenis' => implode('|', array_keys(config('dokumen.jenis')))])
+        ->where(['jenis' => '[a-z0-9]+(?:-[a-z0-9]+)*']) // slug valid; jenis yang tidak ada -> 404 di controller
         ->group(function () {
             Route::get('/', [DokumenController::class, 'index'])->name('index');
             Route::get('/tambah', [DokumenController::class, 'create'])->middleware('izin:dokumen.tambah')->name('create');

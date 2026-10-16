@@ -3,7 +3,7 @@
 @section('subtitle', $cfg['label'] . ' · ' . $dokumen->no_dokumen)
 
 @section('content')
-@php $u = auth()->user(); $range = $cfg['tanggal'] === 'range'; $w = $cfg['warna']; @endphp
+@php $u = auth()->user(); $range = $cfg['tanggal'] === 'range'; $w = $cfg['warna']; $adaLink = $cfg['link']; @endphp
 <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
     <a href="{{ route('dokumen.index', $jenis) }}" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-600"><i data-lucide="arrow-left" class="h-4 w-4"></i>Kembali ke {{ $cfg['label'] }}</a>
     <div class="flex gap-2">
@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<div class="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+<div class="grid gap-6 {{ $adaLink ? 'xl:grid-cols-[420px_minmax(0,1fr)]' : 'mx-auto max-w-3xl' }}">
     <div class="min-w-0 space-y-6">
         <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="mb-4 flex items-start justify-between gap-3">
@@ -25,7 +25,7 @@
                     ['Divisi', $dokumen->divisi?->nama_divisi ?? '-'],
                     [$range ? 'Tanggal Awal' : 'Tanggal Dokumen', $dokumen->tanggal_awal?->translatedFormat('d F Y')],
                     ...($range ? [['Tanggal Akhir', $dokumen->tanggal_akhir?->translatedFormat('d F Y')]] : []),
-                    ['Lokasi', $dokumen->lokasi ?: '-'],
+                    ...($cfg['lokasi'] ? [['Lokasi', $dokumen->lokasi ?: '-']] : []),
                     ['Dibuat oleh', ($dokumen->pembuat?->name ?? '-') . ' · ' . $dokumen->created_at->translatedFormat('d M Y H:i')],
                 ] as [$k, $v])
                     <div class="flex justify-between gap-4 border-b border-slate-100 pb-2"><dt class="shrink-0 text-slate-500">{{ $k }}</dt><dd class="min-w-0 text-right font-semibold [overflow-wrap:anywhere]">{{ $v }}</dd></div>
@@ -33,10 +33,10 @@
             </dl>
         </section>
 
-        @if ($dokumen->rangkuman)
+        @if ($cfg['rangkuman'] && $dokumen->rangkuman)
             <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h3 class="mb-2 font-bold">Rangkuman</h3><p class="whitespace-pre-line text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere]">{{ $dokumen->rangkuman }}</p></section>
         @endif
-        @if ($dokumen->catatan)
+        @if ($cfg['catatan'] && $dokumen->catatan)
             <section class="rounded-2xl border border-amber-200 bg-amber-50 p-6"><h3 class="mb-2 font-bold text-amber-800">Catatan</h3><p class="whitespace-pre-line text-sm text-amber-900/80 [overflow-wrap:anywhere]">{{ $dokumen->catatan }}</p></section>
         @endif
 
@@ -58,6 +58,7 @@
         @endif
     </div>
 
+    @if ($adaLink)
     <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="flex items-center justify-between border-b border-slate-100 px-5 py-3">
             <h3 class="font-bold">Pratinjau Dokumen</h3>
@@ -69,5 +70,6 @@
             <div class="grid h-80 place-items-center text-sm text-slate-400"><div class="text-center"><i data-lucide="file-x" class="mx-auto mb-3 h-10 w-10"></i>Dokumen ini belum memiliki link.</div></div>
         @endif
     </section>
+    @endif
 </div>
 @endsection

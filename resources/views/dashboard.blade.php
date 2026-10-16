@@ -5,7 +5,8 @@
 @section('content')
 @php
     $u = auth()->user();
-    $jenisCfg = config('dokumen.jenis');
+    // jenis aktif + jenis nonaktif yang masih punya dokumen
+    $jenisCfg = collect(\App\Models\JenisDokumen::map())->filter(fn ($j, $s) => $j['aktif'] || ($perJenis[$s] ?? 0) > 0)->all();
     \Illuminate\Support\Carbon::setLocale('id');
 
     // Data grafik disiapkan di sini (bukan di dalam @json) supaya parser Blade tidak salah baca.
@@ -164,7 +165,7 @@
                             <td class="min-w-[110px] px-4 py-3 text-slate-600 [overflow-wrap:anywhere]">{{ $d->divisi?->nama_divisi ?? '-' }}</td>
                             <td class="px-4 py-3">@include('partials.status-badge', ['status' => $d->status_efektif])</td>
                             <td class="px-4 py-3 text-right">
-                                @if ($d->link_dokumen)
+                                @if (($d->config['link'] ?? true) && $d->link_dokumen)
                                     <button @click="$store.preview.open({url:@js($d->link_embed),raw:@js($d->link_dokumen),title:@js($d->nama_dokumen),id:{{ $d->id }}})" class="rounded-lg bg-rose-50 p-2 text-rose-600 hover:bg-rose-100" title="Preview"><i data-lucide="file-text" class="h-4 w-4"></i></button>
                                 @endif
                             </td>
@@ -193,12 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
     Chart.defaults.font.family = '"Plus Jakarta Sans", sans-serif';
     Chart.defaults.color = '#64748b';
 
-    const warna = { brand:'#137a45', green:'#22c55e', emerald:'#10b981', teal:'#14b8a6', lime:'#84cc16', amber:'#f59e0b', sage:'#5f8f76', olive:'#889340', rose:'#f43f5e' };
+    const warna = @json(config('dokumen.warna_hex'));
     const jenis = @json($jenisChart);
 
     new Chart(document.getElementById('chJenis'), {
         type: 'doughnut',
-        data: { labels: jenis.map(j => j.label), datasets: [{ data: jenis.map(j => j.total), backgroundColor: jenis.map(j => warna[j.warna]), borderWidth: 3, borderColor: '#fff' }] },
+        data: { labels: jenis.map(j => j.label), datasets: [{ data: jenis.map(j => j.total), backgroundColor: jenis.map(j => warna[j.warna] || '#94a3b8'), borderWidth: 3, borderColor: '#fff' }] },
         options: { maintainAspectRatio: false, cutout: '66%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, usePointStyle: true, font: { size: 11 } } } } }
     });
 

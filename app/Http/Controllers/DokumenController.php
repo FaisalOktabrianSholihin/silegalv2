@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Dokumen, Divisi};
+use App\Models\{Dokumen, Divisi, JenisDokumen};
 use App\Support\Aktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,12 @@ class DokumenController extends Controller
 {
     private function cfg(string $jenis): array
     {
-        return config("dokumen.jenis.$jenis") ?? abort(404);
+        return JenisDokumen::cfg($jenis) ?? abort(404);
+    }
+
+    private function pastikanAktif(array $cfg): void
+    {
+        abort_unless($cfg['aktif'], 403, "Jenis dokumen {$cfg['label']} sedang dinonaktifkan.");
     }
 
     /** Pastikan dokumen sesuai jenis & user berhak (aturan per divisi). */
@@ -37,22 +42,25 @@ class DokumenController extends Controller
 
         return view('dokumen.index', [
             'jenis' => $jenis, 'cfg' => $cfg, 'data' => $data,
-            'statuses' => config('dokumen.status'),
+            'statuses' => JenisDokumen::statusUntuk($cfg),
             'divisis' => $u->lihatSemuaDivisi() ? Divisi::orderBy('nama_divisi')->get() : collect(),
         ]);
     }
 
     public function create(string $jenis)
     {
+        $cfg = $this->cfg($jenis);
+        $this->pastikanAktif($cfg);
         return view('dokumen.form', [
-            'jenis' => $jenis, 'cfg' => $this->cfg($jenis), 'dokumen' => new Dokumen(['status' => 'Aktif']),
-            'statuses' => config('dokumen.status'), 'divisis' => Divisi::orderBy('nama_divisi')->get(),
+            'jenis' => $jenis, 'cfg' => $cfg, 'dokumen' => new Dokumen(['status' => 'Aktif']),
+            'statuses' => JenisDokumen::statusUntuk($cfg), 'divisis' => Divisi::orderBy('nama_divisi')->get(),
         ]);
     }
 
     public function store(Request $r, string $jenis)
     {
         $cfg = $this->cfg($jenis);
+        $this->pastikanAktif($cfg);
         $data = $r->validate($this->rules($r, $jenis, $cfg));
         $divisiId = $this->tentukanDivisi($r, $data);
 
@@ -85,7 +93,7 @@ class DokumenController extends Controller
 
         return view('dokumen.form', [
             'jenis' => $jenis, 'cfg' => $cfg, 'dokumen' => $dokumen,
-            'statuses' => config('dokumen.status'), 'divisis' => Divisi::orderBy('nama_divisi')->get(),
+            'statuses' => JenisDokumen::statusUntuk($cfg), 'divisis' => Divisi::orderBy('nama_divisi')->get(),
         ]);
     }
 
@@ -131,16 +139,18 @@ class DokumenController extends Controller
     private function rules(Request $r, string $jenis, array $cfg, ?int $ignoreId = null): array
     {
         $rules = [
-            'status'       => ['required', Rule::in(config('dokumen.status'))],
+            'status'       => ['required', Rule::in(JenisDokumen::statusUntuk($cfg))],
             'no_dokumen'   => ['required', 'string', 'max:255',
                 Rule::unique('dokumens', 'no_dokumen')->where(fn ($q) => $q->whereIn('jenis', Dokumen::nilaiJenis($jenis)))->whereNull('deleted_at')->ignore($ignoreId)],
             'nama_dokumen' => ['required', 'string', 'max:255'],
             'tanggal_awal' => ['required', 'date'],
-            'lokasi'       => ['nullable', 'string', 'max:255'],
-            'catatan'      => ['nullable', 'string'],
-            'link_dokumen' => ['nullable', 'url', 'max:1000'],
-            'rangkuman'    => ['nullable', 'string'],
         ];
+
+        // Field opsional hanya divalidasi & disimpan jika diaktifkan pada jenis dokumen ini
+        if ($cfg['lokasi'])    $rules['lokasi']       = ['nullable', 'string', 'max:255'];
+        if ($cfg['catatan'])   $rules['catatan']      = ['nullable', 'string'];
+        if ($cfg['link'])      $rules['link_dokumen'] = ['nullable', 'url', 'max:1000'];
+        if ($cfg['rangkuman']) $rules['rangkuman']    = ['nullable', 'string'];
 
         if ($cfg['tanggal'] === 'range') {
             $rules['tanggal_akhir'] = ['required', 'date', 'after_or_equal:tanggal_awal'];

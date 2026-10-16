@@ -34,7 +34,7 @@ class Dokumen extends Model
     public static function slugJenis(?string $nilai): string
     {
         $nilai = trim((string) $nilai);
-        foreach (config('dokumen.jenis') as $slug => $c) {
+        foreach (JenisDokumen::map() as $slug => $c) {
             if (strcasecmp($nilai, $slug) === 0 || strcasecmp($nilai, $c['label']) === 0) return $slug;
         }
         return Str::slug($nilai);
@@ -43,7 +43,17 @@ class Dokumen extends Model
     /** Daftar nilai kolom `jenis` yang dianggap sama (slug + label). */
     public static function nilaiJenis(string $slug): array
     {
-        return array_values(array_unique(array_filter([$slug, config("dokumen.jenis.$slug.label")])));
+        return array_values(array_unique(array_filter([$slug, JenisDokumen::cfg($slug)['label'] ?? null])));
+    }
+
+    /** Nilai kolom `jenis` dari semua jenis yang punya masa berlaku (rentang tanggal). */
+    public static function nilaiJenisBerjangka(): array
+    {
+        $hasil = [];
+        foreach (JenisDokumen::map() as $slug => $c) {
+            if ($c['tanggal'] === 'range') $hasil = array_merge($hasil, self::nilaiJenis($slug));
+        }
+        return array_values(array_unique($hasil));
     }
 
     /** Selalu kembalikan slug, apa pun format yang tersimpan di database. */
@@ -58,10 +68,16 @@ class Dokumen extends Model
         return $user->divisi_id ? $q->where('divisi_id', $user->divisi_id) : $q->whereRaw('1 = 0');
     }
 
-    public function getConfigAttribute(): array { return config("dokumen.jenis.{$this->jenis}", []); }
+    public function getConfigAttribute(): array { return JenisDokumen::cfg($this->jenis) ?? []; }
+
+    /** true jika jenis dokumen ini memakai rentang tanggal (punya masa berlaku). */
+    public function getBerjangkaAttribute(): bool { return ($this->config['tanggal'] ?? 'single') === 'range'; }
 
     public function getStatusEfektifAttribute(): string
     {
+        // Jenis 1 tanggal (mis. BOM Meeting, Risalah) tidak punya masa berlaku -> tidak pernah "Kadaluarsa"
+        if (! $this->berjangka) return $this->status === 'Kadaluarsa' ? 'Aktif' : $this->status;
+
         if (in_array($this->status, ['Selesai', 'Dibatalkan'], true)) return $this->status;
         if ($this->tanggal_akhir) {
             if ($this->tanggal_akhir->lt(today())) return 'Kadaluarsa';
@@ -72,7 +88,7 @@ class Dokumen extends Model
 
     public function getSisaHariAttribute(): ?int
     {
-        return $this->tanggal_akhir ? (int) round(today()->diffInDays($this->tanggal_akhir, false)) : null;
+        return ($this->berjangka && $this->tanggal_akhir) ? (int) round(today()->diffInDays($this->tanggal_akhir, false)) : null;
     }
 
     /** Ubah link Google Drive / Docs menjadi URL yang bisa di-embed di iframe. */

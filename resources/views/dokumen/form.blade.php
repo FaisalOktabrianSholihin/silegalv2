@@ -56,29 +56,35 @@
                     @error('tanggal_akhir')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
                 </div>
             @endif
-            <div class="{{ $range ? '' : 'sm:col-span-2' }}">
-                <label class="lbl">Lokasi</label>
-                <input name="lokasi" value="{{ old('lokasi', $dokumen->lokasi) }}" class="field" placeholder="Lokasi arsip / tempat dokumen disimpan">
-            </div>
+            @if ($cfg['lokasi'])
+                <div class="{{ $range ? '' : 'sm:col-span-2' }}">
+                    <label class="lbl">Lokasi</label>
+                    <input name="lokasi" value="{{ old('lokasi', $dokumen->lokasi) }}" class="field" placeholder="Lokasi arsip / tempat dokumen disimpan">
+                </div>
+            @endif
         </div>
     </section>
 
+    @if ($cfg['link'] || $cfg['rangkuman'] || $cfg['catatan'])
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="mb-5 flex items-center gap-3">
             <div class="grid h-10 w-10 place-items-center rounded-xl bg-brand-50 text-brand-600"><i data-lucide="link" class="h-5 w-5"></i></div>
-            <h3 class="font-bold">Link, Rangkuman & Catatan</h3>
+            <h3 class="font-bold">{{ collect([$cfg['link'] ? 'Link' : null, $cfg['rangkuman'] ? 'Rangkuman' : null, $cfg['catatan'] ? 'Catatan' : null])->filter()->join(', ', ' & ') }}</h3>
         </div>
         <div class="space-y-5">
+            @if ($cfg['link'])
             <div>
                 <label class="lbl">Link Dokumen (PDF)</label>
                 <input type="url" name="link_dokumen" value="{{ old('link_dokumen', $dokumen->link_dokumen) }}" class="field @error('link_dokumen') err @enderror" placeholder="https://drive.google.com/file/d/…/view  atau  https://…/dokumen.pdf">
                 <p class="mt-1 text-xs text-slate-400">Link Google Drive otomatis diubah agar bisa dipratinjau. Pastikan akses link dapat dilihat oleh pengguna.</p>
                 @error('link_dokumen')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
             </div>
-            <div><label class="lbl">Rangkuman</label><textarea name="rangkuman" rows="4" class="field" placeholder="Ringkasan isi dokumen…">{{ old('rangkuman', $dokumen->rangkuman) }}</textarea></div>
-            <div><label class="lbl">Catatan</label><textarea name="catatan" rows="3" class="field" placeholder="Catatan tambahan…">{{ old('catatan', $dokumen->catatan) }}</textarea></div>
+            @endif
+            @if ($cfg['rangkuman'])<div><label class="lbl">Rangkuman</label><textarea name="rangkuman" rows="4" class="field" placeholder="Ringkasan isi dokumen…">{{ old('rangkuman', $dokumen->rangkuman) }}</textarea></div>@endif
+            @if ($cfg['catatan'])<div><label class="lbl">Catatan</label><textarea name="catatan" rows="3" class="field" placeholder="Catatan tambahan…">{{ old('catatan', $dokumen->catatan) }}</textarea></div>@endif
         </div>
     </section>
+    @endif
 
     @if ($cfg['pihak'])
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" x-data="{ pihak: @js($pihakAwal) }">

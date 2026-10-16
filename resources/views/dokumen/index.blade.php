@@ -5,6 +5,7 @@
 @section('content')
 @php $u = auth()->user(); $w = $cfg['warna']; $range = $cfg['tanggal'] === 'range'; @endphp
 
+
 <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
     <div class="flex min-w-0 items-center gap-4">
         <div class="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-{{ $w }}-50 text-{{ $w }}-600 ring-1 ring-{{ $w }}-100"><i data-lucide="{{ $cfg['icon'] }}" class="h-7 w-7"></i></div>
@@ -13,7 +14,7 @@
             <p class="text-sm text-slate-500">{{ number_format($data->total()) }} dokumen ditemukan</p>
         </div>
     </div>
-    @if ($u->bisa('dokumen.tambah'))
+    @if ($u->bisa('dokumen.tambah') && $cfg['aktif'])
         <a href="{{ route('dokumen.create', $jenis) }}" class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30 transition hover:shadow-xl">
             <i data-lucide="plus" class="h-4 w-4"></i>Tambah Dokumen
         </a>
@@ -46,7 +47,7 @@
             <div class="mt-2 text-sm font-bold leading-snug text-slate-800 [overflow-wrap:anywhere]">{{ $d->nama_dokumen }}</div>
             <dl class="mt-3 space-y-1.5 text-xs text-slate-600">
                 <div class="flex gap-2"><dt class="w-20 shrink-0 text-slate-400">{{ $range ? 'Masa Berlaku' : 'Tanggal' }}</dt><dd class="min-w-0">@include('partials.dokumen-tanggal', ['d' => $d, 'range' => $range])</dd></div>
-                <div class="flex gap-2"><dt class="w-20 shrink-0 text-slate-400">Lokasi</dt><dd class="min-w-0 [overflow-wrap:anywhere]">{{ $d->lokasi ?: '-' }}</dd></div>
+                @if ($cfg['lokasi'])<div class="flex gap-2"><dt class="w-20 shrink-0 text-slate-400">Lokasi</dt><dd class="min-w-0 [overflow-wrap:anywhere]">{{ $d->lokasi ?: '-' }}</dd></div>@endif
                 @if ($u->lihatSemuaDivisi())<div class="flex gap-2"><dt class="w-20 shrink-0 text-slate-400">Divisi</dt><dd class="min-w-0 [overflow-wrap:anywhere]">{{ $d->divisi?->nama_divisi ?? '-' }}</dd></div>@endif
             </dl>
             <div class="mt-3 border-t border-slate-100 pt-2">@include('partials.dokumen-aksi', ['d' => $d, 'jenis' => $jenis, 'u' => $u])</div>
@@ -68,7 +69,7 @@
                     <th class="px-4 py-3.5">Nama Dokumen</th>
                     @if ($u->lihatSemuaDivisi())<th class="px-4 py-3.5">Divisi</th>@endif
                     <th class="px-4 py-3.5">{{ $range ? 'Masa Berlaku' : 'Tanggal' }}</th>
-                    <th class="px-4 py-3.5">Lokasi</th>
+                    @if ($cfg['lokasi'])<th class="px-4 py-3.5">Lokasi</th>@endif
                     <th class="px-4 py-3.5">Status</th>
                     <th class="px-4 py-3.5 text-right">Aksi</th>
                 </tr>
@@ -79,7 +80,7 @@
                         <td class="px-5 py-3.5 text-slate-400">{{ $data->firstItem() + $i }}</td>
                         <td class="min-w-[90px] max-w-[160px] px-4 py-3.5 font-mono text-xs font-semibold text-slate-600 [overflow-wrap:anywhere]">{{ $d->no_dokumen }}</td>
                         <td class="min-w-[220px] max-w-[380px] px-4 py-3.5 [overflow-wrap:anywhere]">
-                            @if ($d->link_dokumen)
+                            @if ($cfg['link'] && $d->link_dokumen)
                                 <button type="button" @click="$store.preview.open({url:@js($d->link_embed),raw:@js($d->link_dokumen),title:@js($d->nama_dokumen),id:{{ $d->id }}})" class="text-left font-semibold leading-snug text-slate-800 hover:text-brand-600">
                                     {{ $d->nama_dokumen }}
                                     <span class="ml-1 inline-block rounded bg-rose-50 px-1.5 py-0.5 align-middle text-[10px] font-bold text-rose-600">PDF</span>
@@ -90,12 +91,12 @@
                         </td>
                         @if ($u->lihatSemuaDivisi())<td class="min-w-[120px] max-w-[200px] px-4 py-3.5 text-slate-600 [overflow-wrap:anywhere]">{{ $d->divisi?->nama_divisi ?? '-' }}</td>@endif
                         <td class="whitespace-nowrap px-4 py-3.5 text-slate-600">@include('partials.dokumen-tanggal', ['d' => $d, 'range' => $range])</td>
-                        <td class="min-w-[100px] max-w-[200px] px-4 py-3.5 text-slate-600 [overflow-wrap:anywhere]">{{ $d->lokasi ?: '-' }}</td>
+                        @if ($cfg['lokasi'])<td class="min-w-[100px] max-w-[200px] px-4 py-3.5 text-slate-600 [overflow-wrap:anywhere]">{{ $d->lokasi ?: '-' }}</td>@endif
                         <td class="px-4 py-3.5">@include('partials.status-badge', ['status' => $d->status_efektif])</td>
                         <td class="px-4 py-3.5">@include('partials.dokumen-aksi', ['d' => $d, 'jenis' => $jenis, 'u' => $u])</td>
                     </tr>
                 @empty
-                    <tr><td colspan="8" class="px-6 py-16 text-center text-slate-400"><i data-lucide="folder-open" class="mx-auto mb-3 h-10 w-10"></i>Belum ada dokumen {{ $cfg['label'] }}.</td></tr>
+                    <tr><td colspan="{{ 6 + ($u->lihatSemuaDivisi() ? 1 : 0) + ($cfg['lokasi'] ? 1 : 0) }}" class="px-6 py-16 text-center text-slate-400"><i data-lucide="folder-open" class="mx-auto mb-3 h-10 w-10"></i>Belum ada dokumen {{ $cfg['label'] }}.</td></tr>
                 @endforelse
             </tbody>
         </table>

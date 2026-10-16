@@ -1,8 +1,8 @@
 @php
     $u = auth()->user();
-    $jenisList = config('dokumen.jenis');
+    $jenisList = \App\Models\JenisDokumen::aktif();
     $aktifJenis = request()->route('jenis');
-    $menuMaster = request()->routeIs('master.*', 'users.*');
+    $menuMaster = request()->routeIs('master.*', 'users.*', 'jenis-dokumen.*');
 @endphp
 <!DOCTYPE html>
 <html lang="id" class="h-full">
@@ -73,7 +73,7 @@
     <nav class="sidebar-scroll flex-1 overflow-y-auto px-4 pb-6">
         <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i data-lucide="layout-dashboard" class="h-[18px] w-[18px]"></i>Dashboard</a>
 
-        @if ($u->bisa('master.kelola') || $u->bisa('user.kelola'))
+        @if ($u->bisa('master.kelola') || $u->bisa('user.kelola') || $u->bisa('jenis.kelola'))
             <div class="nav-label">Master Data</div>
             <button @click="master=!master" class="nav-link w-full {{ $menuMaster ? 'text-white' : '' }}">
                 <i data-lucide="database" class="h-[18px] w-[18px]"></i>Master Data
@@ -86,6 +86,9 @@
                 @endif
                 @if ($u->bisa('user.kelola'))
                     <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}"><i data-lucide="user-cog" class="h-4 w-4"></i>User</a>
+                @endif
+                @if ($u->bisa('jenis.kelola'))
+                    <a href="{{ route('jenis-dokumen.index') }}" class="nav-link {{ request()->routeIs('jenis-dokumen.*') ? 'active' : '' }}"><i data-lucide="layers" class="h-4 w-4"></i>Jenis Dokumen</a>
                 @endif
             </div>
         @endif

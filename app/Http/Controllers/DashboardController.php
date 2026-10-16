@@ -15,13 +15,15 @@ class DashboardController extends Controller
         $today = today();
         $batas = today()->addDays(config('dokumen.warning_days'));
         $tutup = ['Selesai', 'Dibatalkan'];
+        // Hanya jenis ber-rentang tanggal yang punya masa berlaku (BOM Meeting & Risalah 1 tanggal tidak ikut dihitung)
+        $berjangka = Dokumen::nilaiJenisBerjangka();
 
         $stat = [
             'total'      => $base()->count(),
             'aktif'      => $base()->where('status', 'Aktif')
-                                ->where(fn ($q) => $q->whereNull('tanggal_akhir')->orWhere('tanggal_akhir', '>=', $today))->count(),
-            'segera'     => $base()->whereNotIn('status', $tutup)->whereBetween('tanggal_akhir', [$today, $batas])->count(),
-            'kadaluarsa' => $base()->whereNotIn('status', $tutup)->whereNotNull('tanggal_akhir')->where('tanggal_akhir', '<', $today)->count(),
+                                ->where(fn ($q) => $q->whereNull('tanggal_akhir')->orWhere('tanggal_akhir', '>=', $today)->orWhereNotIn('jenis', $berjangka))->count(),
+            'segera'     => $base()->whereIn('jenis', $berjangka)->whereNotIn('status', $tutup)->whereBetween('tanggal_akhir', [$today, $batas])->count(),
+            'kadaluarsa' => $base()->whereIn('jenis', $berjangka)->whereNotIn('status', $tutup)->whereNotNull('tanggal_akhir')->where('tanggal_akhir', '<', $today)->count(),
         ];
 
         // Kelompokkan per slug di PHP, karena di database bisa tersimpan sebagai label ("BOM Meeting") maupun slug ("bom-meeting").
@@ -47,7 +49,7 @@ class DashboardController extends Controller
             $perDivisi = $hitung->map(fn ($r) => (object) ['nama' => $nama[$r->divisi_id] ?? 'Tanpa Divisi', 'total' => (int) $r->total])->values();
         }
 
-        $segeraList = $base()->with('divisi')->whereNotIn('status', $tutup)->whereNotNull('tanggal_akhir')
+        $segeraList = $base()->with('divisi')->whereIn('jenis', $berjangka)->whereNotIn('status', $tutup)->whereNotNull('tanggal_akhir')
             ->where('tanggal_akhir', '<=', $batas)->orderBy('tanggal_akhir')->limit(6)->get();
         $terbaru = $base()->with('divisi')->latest('id')->limit(6)->get();
 
